@@ -1,72 +1,163 @@
-# 🌱 Mon Cacao - IA Prédictive
+# 🌱 Mon Cacao - Application d'Analyse et Prédiction de Productivité
 
-Application web moderne utilisant l'IA pour prédire la productivité des plantations de cacao en Côte d'Ivoire.
+Une application web complète pour l'analyse et la prédiction de la productivité du cacao, intégrant des fonctionnalités d'IA, d'analyse de données et de score écologique.
 
-## ✨ Fonctionnalités
+## 🚀 Fonctionnalités Principales
 
-- 🔮 **Prédiction intelligente** avec modèle XGBoost
-- 📊 **Tableau de bord interactif** avec visualisations
-- 👤 **Système d'authentification** sécurisé
-- 📥 **Collecte de données** réelles
-- 📂 **Historique personnel** des prédictions
+### 📊 Tableau de Bord Interactif
+- Visualisations en temps réel de la production
+- Graphiques de tendances et analyses
+- Métriques de performance clés
 
-## 🚀 Installation Rapide
+### 🤖 Prédictions IA
+- Modèle XGBoost pour prédire la productivité
+- Interface intuitive pour saisir les paramètres
+- Résultats détaillés avec explications
 
-```bash
-# Cloner le projet
-git clone https://github.com/votre-username/mon-cacao.git
-cd mon-cacao
+### 🌿 Score Écologique
+- Évaluation de l'impact environnemental
+- Indicateurs de durabilité
+- Recommandations d'amélioration
 
-# Installer les dépendances
-pip install -r requirements.txt
+### 📈 Analyse des Revenus
+- Suivi des revenus par période
+- Projections financières
+- Analyse de rentabilité
 
-# Lancer l'application
-streamlit run cacao1.py
-```
+### 💡 Assistant IA
+- Conseils personnalisés
+- Recommandations d'optimisation
+- Support multilingue
 
-## 📋 Utilisation
+## 🛠️ Technologies Utilisées
 
-1. **Créer un compte** ou se connecter
-2. **Remplir le formulaire** de prédiction
-3. **Obtenir les résultats** : production, revenu, bénéfice
-4. **Consulter les analyses** comparatives
-5. **Soumettre vos données** réelles
+- **Backend**: Python, Flask, XGBoost
+- **Frontend**: HTML5, CSS3, JavaScript
+- **Base de données**: SQLite
+- **IA/ML**: Scikit-learn, Pandas, NumPy
+- **Visualisation**: Chart.js, Plotly
 
-## 🛠️ Technologies
+## 📋 Prérequis
 
-- **Frontend** : Streamlit 1.47.0
-- **ML** : XGBoost, Scikit-learn
-- **Base de données** : SQLite
-- **Visualisations** : Plotly
+- Python 3.8+
+- pip (gestionnaire de paquets Python)
 
-## 📁 Structure
+## 🔧 Installation
+
+1. **Cloner le dépôt**
+   ```bash
+   git clone https://github.com/votre-username/mon-cacao.git
+   cd mon-cacao
+   ```
+
+2. **Installer les dépendances**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. **Lancer l'application**
+   ```bash
+   python api_server.py
+   ```
+
+4. **Ouvrir dans le navigateur**
+   ```
+   http://localhost:5000
+   ```
+
+## 📁 Structure du Projet
 
 ```
 mon-cacao/
-├── cacao1.py                 # Application principale
-├── train_model.py            # Entraînement du modèle
-├── model_productivite_xgb.pkl # Modèle pré-entraîné
-├── requirements.txt          # Dépendances
+├── api_server.py              # Serveur Flask principal
+├── cacao1.py                  # Logique métier principale
+├── model_productivite_xgb.pkl # Modèle XGBoost entraîné
+├── requirements.txt           # Dépendances Python
+├── frontend/                  # Interface utilisateur
+│   ├── index.html            # Page d'accueil
+│   ├── dashboard.html        # Tableau de bord
+│   ├── prediction.html       # Prédictions IA
+│   ├── score-ecologique.html # Score écologique
+│   ├── css/                  # Styles CSS
+│   └── js/                   # Scripts JavaScript
 └── docs/                     # Documentation
 ```
 
+## 🎯 Utilisation
+
+### 1. Accès à l'Application
+- Ouvrez `http://localhost:5000` dans votre navigateur
+- Naviguez entre les différentes sections via le menu
+
+### 2. Prédictions de Productivité
+- Rendez-vous sur la page "Prédictions"
+- Saisissez les paramètres de votre plantation
+- Obtenez une prédiction de productivité
+
+### 3. Analyse du Score Écologique
+- Accédez à la section "Score Écologique"
+- Évaluez l'impact environnemental
+- Consultez les recommandations
+
+### 4. Tableau de Bord
+- Visualisez les métriques clés
+- Analysez les tendances
+- Suivez les performances
+
+## 🔍 Fonctionnalités Avancées
+
+### Modèle XGBoost
+- Prédiction précise basée sur l'historique
+- Variables d'entrée optimisées
+- Validation croisée intégrée
+
+### Interface Responsive
+- Design adaptatif pour mobile et desktop
+- Navigation intuitive
+- Chargement optimisé
+
+### Analyse en Temps Réel
+- Mise à jour automatique des données
+- Graphiques interactifs
+- Export des résultats
+
+## 📊 Métriques et Indicateurs
+
+- **Productivité**: kg/ha par saison
+- **Score Écologique**: 0-100 (durabilité)
+- **Revenus**: Projections financières
+- **Tendances**: Évolution temporelle
+
 ## 🤝 Contribution
 
+Les contributions sont les bienvenues ! Pour contribuer :
+
 1. Fork le projet
-2. Créer une branche (`git checkout -b feature/NouvelleFonctionnalite`)
-3. Commit (`git commit -m 'Ajouter fonctionnalité'`)
-4. Push (`git push origin feature/NouvelleFonctionnalite`)
-5. Ouvrir une Pull Request
+2. Créez une branche pour votre fonctionnalité
+3. Committez vos changements
+4. Poussez vers la branche
+5. Ouvrez une Pull Request
+
+## 📝 Licence
+
+Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
 
 ## 📞 Support
 
-- **Issues** : [GitHub Issues](https://github.com/votre-username/mon-cacao/issues)
-- **Email** : support@moncacao.ci
+Pour toute question ou problème :
+- Ouvrez une issue sur GitHub
+- Consultez la documentation dans le dossier `docs/`
 
-## 📄 Licence
+## 🔄 Mises à Jour
 
-MIT License - voir [LICENSE](LICENSE)
+### Version 1.0
+- ✅ Interface utilisateur complète
+- ✅ Modèle de prédiction XGBoost
+- ✅ Score écologique intégré
+- ✅ Tableau de bord interactif
+- ✅ Assistant IA
+- ✅ Analyse des revenus
 
 ---
 
-**🌱 Ensemble, cultivons l'avenir du cacao ivoirien !**
+**Développé avec ❤️ pour l'agriculture durable du cacao**
