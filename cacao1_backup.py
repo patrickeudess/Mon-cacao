@@ -13,7 +13,7 @@ import time
 
 # Configuration de la page - DOIT ÊTRE LE PREMIER APPEL STREAMLIT
 st.set_page_config(
-    page_title="🎯 MON CACAO - IA PRÉDICTIVE", 
+    page_title="🌱 Mon Cacao - IA Prédictive", 
     page_icon="🌱",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -453,168 +453,7 @@ def logout():
     st.session_state.user_id = None
     st.session_state.username = ""
 
-# ─── FONCTION BANNIÈRE UNIFORME ───────────────────────────────────────────────
-def create_header_banner(page_context=""):
-    """Crée une bannière d'en-tête uniforme pour toutes les pages avec contexte spécifique"""
-    
-    # Déterminer le statut de l'utilisateur
-    if st.session_state.user_id is not None:
-        status_text = "En ligne"
-        status_color = "#28a745"
-        user_role = "Agriculteur"
-        username = st.session_state.username if hasattr(st.session_state, 'username') else "Utilisateur"
-        
-        # Déterminer le contexte de la page pour personnaliser la bannière
-        page_icon = "🍃"
-        page_subtitle = ""
-        
-        if "Soumettre" in page_context:
-            page_icon = "📥"
-            page_subtitle = "Soumission de données"
-        elif "Historique" in page_context or "Mes données" in page_context:
-            page_icon = "📈"
-            page_subtitle = "Historique et analyses"
-        elif "Analyse" in page_context:
-            page_icon = "📊"
-            page_subtitle = "Analyse détaillée"
-        elif "Assistant" in page_context:
-            page_icon = "🤖"
-            page_subtitle = "Assistant IA"
-        elif "Conseil" in page_context:
-            page_icon = "💡"
-            page_subtitle = "Conseils personnalisés"
-        elif "Admin" in page_context:
-            page_icon = "⚙️"
-            page_subtitle = "Administration"
-        elif "Prédiction" in page_context:
-            page_icon = "🎯"
-            page_subtitle = "Prédiction IA"
-        
-        # Bouton de déconnexion avec style amélioré
-        logout_button = f"""
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <span style="font-size: 14px; opacity: 0.9;">👤 {username}</span>
-                <button onclick="window.location.href='/?nav=🚪+Déconnexion'" 
-                        style="background: linear-gradient(135deg, #28a745, #20c997); 
-                               color: white; 
-                               border: none; 
-                               padding: 10px 18px; 
-                               border-radius: 8px; 
-                               cursor: pointer; 
-                               font-weight: 600; 
-                               font-size: 14px;
-                               box-shadow: 0 3px 8px rgba(0,0,0,0.15); 
-                               display: flex; 
-                               align-items: center; 
-                               gap: 8px;
-                               transition: all 0.3s ease;
-                               hover: transform: translateY(-2px);
-                               hover: box-shadow: 0 5px 15px rgba(0,0,0,0.2);">
-                    <span style="font-size: 16px;">→</span>
-                    Déconnexion
-                </button>
-            </div>
-        """
-    else:
-        status_text = "Hors ligne"
-        status_color = "#dc3545"
-        user_role = "Visiteur"
-        page_icon = "🍃"
-        page_subtitle = ""
-        logout_button = ""
-    
-    banner_html = f"""
-    <div style="
-        background: linear-gradient(135deg, #2E8B57 0%, #3CB371 100%);
-        padding: 20px 25px;
-        margin: -1rem -1rem 2rem -1rem;
-        border-radius: 0 0 20px 20px;
-        box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        color: white;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        position: relative;
-        overflow: hidden;
-    ">
-        <!-- Effet de brillance -->
-        <div style="
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%);
-            animation: shine 3s infinite;
-        "></div>
-        
-        <!-- Logo et titre -->
-        <div style="display: flex; align-items: center; gap: 15px; position: relative; z-index: 2;">
-            <div style="
-                display: flex; 
-                align-items: center; 
-                gap: 10px; 
-                font-size: 26px;
-                background: rgba(255,255,255,0.1);
-                padding: 8px 12px;
-                border-radius: 12px;
-                backdrop-filter: blur(10px);
-            ">
-                <span style="font-size: 30px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">🍃</span>
-                <span style="font-size: 30px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">🪙</span>
-            </div>
-            <div>
-                <h1 style="
-                    margin: 0; 
-                    font-size: 32px; 
-                    font-weight: 800; 
-                    color: white;
-                    text-shadow: 0 3px 6px rgba(0,0,0,0.3);
-                    letter-spacing: 1px;
-                ">Mon Cacao</h1>
-                <div style="display: flex; align-items: center; gap: 10px; font-size: 15px; margin-top: 6px;">
-                    <div style="
-                        width: 10px; 
-                        height: 10px; 
-                        background-color: {status_color}; 
-                        border-radius: 50%; 
-                        display: inline-block;
-                        box-shadow: 0 0 8px {status_color};
-                        animation: pulse 2s infinite;
-                    "></div>
-                    <span style="font-weight: 600;">{status_text}</span>
-                    <span style="margin-left: 20px; opacity: 0.9;">👤 {user_role}</span>
-                    {f'<span style="margin-left: 20px; opacity: 0.8; font-size: 13px; background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 6px;">{page_icon} {page_subtitle}</span>' if page_subtitle else ''}
-                </div>
-            </div>
-        </div>
-        
-        <!-- Bouton de déconnexion -->
-        <div style="position: relative; z-index: 2;">
-            {logout_button}
-        </div>
-        
-        <!-- CSS pour les animations -->
-        <style>
-            @keyframes shine {{
-                0% {{ transform: translateX(-100%) translateY(-100%) rotate(45deg); }}
-                100% {{ transform: translateX(100%) translateY(100%) rotate(45deg); }}
-            }}
-            @keyframes pulse {{
-                0%, 100% {{ opacity: 1; transform: scale(1); }}
-                50% {{ opacity: 0.7; transform: scale(1.1); }}
-            }}
-        </style>
-    </div>
-    """
-    
-    st.markdown(banner_html, unsafe_allow_html=True)
-
 # ─── INTERFACE STREAMLIT ──────────────────────────────────────────────────────
-# Affichage de la bannière uniforme (sera mise à jour selon la page)
-create_header_banner()
-
 st.sidebar.title("Mon Cacao")
 st.sidebar.subheader("🔗 Navigation")
 
@@ -626,12 +465,12 @@ else:
     if st.session_state.username in allowed_admins:
         choice = st.sidebar.radio(
             "Aller à :",
-            ("📊 Prédiction", "📥 Soumettre données", "📂 Mes données", "🤖 Assistant IA", "💡 Conseils", "🔒 Admin", "🚪 Déconnexion"),
+            ("📊 Prédiction", "📥 Soumettre données", "📂 Mes données", "🔒 Admin", "🚪 Déconnexion"),
         )
     else:
         choice = st.sidebar.radio(
             "Aller à :",
-            ("📊 Prédiction", "📥 Soumettre données", "📂 Mes données", "🤖 Assistant IA", "💡 Conseils", "🚪 Déconnexion"),
+            ("📊 Prédiction", "📥 Soumettre données", "📂 Mes données", "🚪 Déconnexion"),
         )
 
 # ─── PAGE INSCRIPTION ─────────────────────────────────────────────────────────
@@ -640,7 +479,7 @@ if choice == "📝 Inscription":
     col1, col2, col3 = st.columns([1,2,1])
     
     with col2:
-        st.title("🎯 INSCRIPTION")
+        st.title("📝 Inscription")
         
         # Container stylisé pour le formulaire d'inscription
         with st.container():
@@ -707,7 +546,7 @@ elif choice == "🔑 Connexion":
     col1, col2, col3 = st.columns([1,2,1])
     
     with col2:
-        st.title("🎯 CONNEXION")
+        st.title("🔑 Connexion")
         
         # Container stylisé pour le formulaire de connexion
         with st.container():
@@ -767,9 +606,7 @@ elif choice == "🚪 Déconnexion" and st.session_state.user_id is not None:
 
 # ─── PAGE PRÉDICTION ──────────────────────────────────────────────────────────
 elif choice == "📊 Prédiction" and st.session_state.user_id is not None:
-    # Bannière personnalisée pour la page de prédiction
-    create_header_banner("Prédiction")
-    st.title("🎯 PRÉDICTION DE LA PRODUCTIVITÉ CACAO")
+    st.title("📊 Prédiction de la productivité cacao")
     
     # Introduction avec un conteneur stylisé
     with st.container():
@@ -1092,7 +929,7 @@ elif choice == "📊 Prédiction" and st.session_state.user_id is not None:
             ))
             
             fig_comp.update_layout(
-                title="📊 COMPARAISON AVEC LA MOYENNE RÉGIONALE",
+                title=f"Comparaison avec la moyenne régionale ({region})",
                 barmode='group',
                 plot_bgcolor='white',
                 height=400
@@ -1109,7 +946,7 @@ elif choice == "📊 Prédiction" and st.session_state.user_id is not None:
             )])
             
             fig_fin.update_layout(
-                title="💰 RÉPARTITION FINANCIÈRE",
+                title="Répartition financière",
                 height=400
             )
             
@@ -1255,9 +1092,7 @@ elif choice == "📊 Prédiction" and st.session_state.user_id is not None:
 
 # ─── PAGE SOUMISSION DE DONNÉES ────────────────────────────────────────────────
 elif choice == "📥 Soumettre données" and st.session_state.user_id is not None:
-    # Bannière personnalisée pour la page de soumission
-    create_header_banner("Soumettre")
-    st.title("📊 SOUMETTRE VOS DONNÉES ANNUELLES RÉELLES")
+    st.title("📥 Soumettre vos données annuelles réelles")
     st.markdown(
         """
         <div style="background-color: #f0f8ff; padding: 20px; border-radius: 10px; margin-bottom: 25px;">
@@ -1473,9 +1308,7 @@ elif choice == "📥 Soumettre données" and st.session_state.user_id is not Non
 
 # ─── PAGE "MES DONNÉES" ────────────────────────────────────────────────────────
 elif choice == "📂 Mes données" and st.session_state.user_id is not None:
-    # Bannière personnalisée pour la page historique
-    create_header_banner("Historique")
-    st.title("📈 HISTORIQUE DE MES DONNÉES")
+    st.title("📂 Historique de mes données")
     
     # Introduction stylisée
     st.markdown("""
@@ -1546,7 +1379,7 @@ elif choice == "📂 Mes données" and st.session_state.user_id is not None:
                     df_user,
                     x='date_ajout',
                     y='Productivite',
-                    title='📈 ÉVOLUTION DE VOTRE PRODUCTIVITÉ',
+                    title='Évolution de votre productivité',
                     labels={'date_ajout': 'Date', 'Productivite': 'Productivité (t/ha)'}
                 )
                 fig_prod.update_layout(
@@ -1561,7 +1394,7 @@ elif choice == "📂 Mes données" and st.session_state.user_id is not None:
                     df_user,
                     x='date_ajout',
                     y='Cout_production_ha',
-                    title='💸 ÉVOLUTION DE VOS COÛTS DE PRODUCTION',
+                    title='Évolution de vos coûts de production',
                     labels={'date_ajout': 'Date', 'Cout_production_ha': 'Coût (FCFA/ha)'}
                 )
                 fig_cout.update_layout(
@@ -1623,7 +1456,7 @@ elif choice == "📂 Mes données" and st.session_state.user_id is not None:
                     pratiques,
                     x='Pratique',
                     y='Utilisation',
-                    title='🌱 TAUX D\'UTILISATION DES PRATIQUES AGRICOLES (%)',
+                    title='Taux d\'utilisation des pratiques agricoles (%)',
                     labels={'Utilisation': '%'}
                 )
                 fig_pratiques.update_layout(plot_bgcolor='white')
@@ -1635,7 +1468,7 @@ elif choice == "📂 Mes données" and st.session_state.user_id is not None:
                 fig_regions = px.pie(
                     values=region_counts.values,
                     names=region_counts.index,
-                    title='🗺️ RÉPARTITION PAR RÉGION'
+                    title='Répartition par région'
                 )
                 st.plotly_chart(fig_regions, use_container_width=True)
 
@@ -1657,106 +1490,9 @@ elif choice == "📂 Mes données" and st.session_state.user_id is not None:
             with st.expander("👁️ Aperçu des données à exporter"):
                 st.dataframe(df_user.head(), use_container_width=True)
 
-# ─── PAGE "ASSISTANT IA" ──────────────────────────────────────────────────────
-elif choice == "🤖 Assistant IA" and st.session_state.user_id is not None:
-    # Bannière personnalisée pour l'assistant IA
-    create_header_banner("Assistant")
-    st.title("🤖 ASSISTANT IA")
-    
-    st.markdown("""
-        <div style="background-color: #f0f8ff; padding: 20px; border-radius: 10px; margin-bottom: 25px;">
-            <h3 style="color: #2E86AB;">🤖 Assistant IA Mon Cacao</h3>
-            <p style="font-size:16px; color:#333;">
-                Votre assistant personnel pour optimiser votre production de cacao :
-                <ul>
-                    <li>💬 Questions-réponses en temps réel</li>
-                    <li>📊 Analyse de vos données</li>
-                    <li>🌱 Conseils personnalisés</li>
-                    <li>📈 Prédictions avancées</li>
-                </ul>
-            </p>
-        </div>
-    """, unsafe_allow_html=True)
-    
-    # Interface de chat avec l'IA
-    if "messages" not in st.session_state:
-        st.session_state.messages = []
-    
-    # Affichage des messages
-    for message in st.session_state.messages:
-        with st.chat_message(message["role"]):
-            st.markdown(message["content"])
-    
-    # Interface de saisie
-    if prompt := st.chat_input("Posez votre question à l'assistant IA..."):
-        # Ajouter le message utilisateur
-        st.session_state.messages.append({"role": "user", "content": prompt})
-        with st.chat_message("user"):
-            st.markdown(prompt)
-        
-        # Simuler une réponse de l'IA
-        with st.chat_message("assistant"):
-            response = f"🤖 **Assistant IA Mon Cacao**\n\nMerci pour votre question ! Je suis là pour vous aider avec votre production de cacao. Voici une réponse personnalisée basée sur vos données..."
-            st.markdown(response)
-            st.session_state.messages.append({"role": "assistant", "content": response})
-
-# ─── PAGE "CONSEILS" ──────────────────────────────────────────────────────────
-elif choice == "💡 Conseils" and st.session_state.user_id is not None:
-    # Bannière personnalisée pour les conseils
-    create_header_banner("Conseil")
-    st.title("💡 CONSEILS PERSONNALISÉS")
-    
-    st.markdown("""
-        <div style="background-color: #f0f8ff; padding: 20px; border-radius: 10px; margin-bottom: 25px;">
-            <h3 style="color: #2E86AB;">💡 Conseils pour optimiser votre production</h3>
-            <p style="font-size:16px; color:#333;">
-                Découvrez des conseils personnalisés basés sur vos données et les meilleures pratiques :
-            </p>
-        </div>
-    """, unsafe_allow_html=True)
-    
-    # Conseils par catégorie
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.markdown("### 🌱 Pratiques agricoles")
-        st.info("""
-        **Fertilisation optimale :**
-        - Utilisez des engrais organiques
-        - Respectez les doses recommandées
-        - Fertilisez en début de saison des pluies
-        """)
-        
-        st.markdown("### 💧 Gestion de l'eau")
-        st.success("""
-        **Irrigation efficace :**
-        - Maintenez une humidité constante
-        - Évitez l'excès d'eau
-        - Utilisez le paillage
-        """)
-    
-    with col2:
-        st.markdown("### 🛡️ Protection des cultures")
-        st.warning("""
-        **Lutte contre les maladies :**
-        - Surveillez régulièrement vos plants
-        - Traitez préventivement
-        - Utilisez des variétés résistantes
-        """)
-        
-        st.markdown("### 📊 Optimisation des coûts")
-        st.info("""
-        **Réduction des coûts :**
-        - Planifiez vos achats
-        - Négociez avec les fournisseurs
-        - Optimisez l'utilisation des intrants
-        """)
-
 # ─── PAGE "ADMIN" (OPTIONNEL) ─────────────────────────────────────────────────
 elif choice == "🔒 Admin" and st.session_state.user_id is not None:
-    # Bannière personnalisée pour l'espace admin
-    create_header_banner("Admin")
-    st.title("⚙️ ESPACE ADMIN")
+    st.title("🔒 Espace Admin")
     conn = get_db_connection()
 
     st.markdown("#### 👥 Utilisateurs enregistrés")
