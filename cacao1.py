@@ -10,6 +10,7 @@ import plotly.graph_objects as go  # type: ignore
 import plotly.express as px  # type: ignore
 from werkzeug.security import generate_password_hash, check_password_hash  # type: ignore
 import time
+from auth_system import auth
 
 # Configuration de la page - DOIT ÊTRE LE PREMIER APPEL STREAMLIT
 st.set_page_config(
@@ -654,21 +655,56 @@ if choice == "📝 Inscription":
                             <li>📈 Suivi de vos performances</li>
                             <li>💡 Recommandations personnalisées</li>
                             <li>📱 Tableau de bord interactif</li>
+                            <li>🌱 Scores écologiques</li>
+                            <li>🤖 Assistant IA personnalisé</li>
                         </ul>
                     </p>
                 </div>
             """, unsafe_allow_html=True)
             
-            # Formulaire d'inscription
+            # Formulaire d'inscription amélioré
             with st.form("signup_form"):
+                col1, col2 = st.columns(2)
+                
+                with col1:
                 new_username = st.text_input("👤 Nom d'utilisateur", 
                                           key="reg_user",
-                                          help="Choisissez un nom d'utilisateur unique")
+                                              help="Choisissez un nom d'utilisateur unique (3-50 caractères)")
+                    
+                    new_email = st.text_input("📧 Adresse e-mail", 
+                                            key="reg_email",
+                                            help="Votre adresse e-mail valide")
                 
                 new_password = st.text_input("🔒 Mot de passe", 
                                           type="password",
                                           key="reg_pwd",
-                                          help="Minimum 6 caractères")
+                                              help="Minimum 8 caractères avec majuscule, minuscule, chiffre et caractère spécial")
+                
+                with col2:
+                    first_name = st.text_input("📝 Prénom", key="reg_first_name")
+                    last_name = st.text_input("📝 Nom de famille", key="reg_last_name")
+                    region = st.selectbox("🌍 Région de production", [
+                        "Abidjan", "San-Pédro", "Gagnoa", "Divo", "Yamoussoukro",
+                        "Bouaké", "Korhogo", "Man", "Daloa", "Autre"
+                    ], key="reg_region")
+                
+                # Politique de gestion des données
+                st.markdown("---")
+                st.markdown("### 📋 Politique de gestion des données")
+                
+                with st.expander("📖 Lire la politique de gestion des données complète"):
+                    try:
+                        with open("POLITIQUE_GESTION_DONNEES.md", "r", encoding="utf-8") as f:
+                            policy_content = f.read()
+                        st.markdown(policy_content)
+                    except FileNotFoundError:
+                        st.info("📄 Politique de gestion des données en cours de chargement...")
+                
+                consent_gdpr = st.checkbox(
+                    "✅ J'accepte la politique de gestion des données et j'autorise le traitement de mes données personnelles",
+                    key="reg_consent",
+                    value=False
+                )
                 
                 confirm_password = st.text_input("🔄 Confirmer le mot de passe",
                                               type="password",
@@ -676,22 +712,30 @@ if choice == "📝 Inscription":
                                               help="Retapez votre mot de passe")
                 
                 # Bouton d'inscription
-                submit = st.form_submit_button("S'inscrire", use_container_width=True)
+                submit = st.form_submit_button("🚀 Créer mon compte", use_container_width=True)
                 
                 if submit:
-                    if not new_username or not new_password:
-                        st.error("⚠️ Tous les champs sont requis.")
-                    elif len(new_password) < 6:
-                        st.error("⚠️ Le mot de passe doit faire au moins 6 caractères.")
+                    # Validation des champs
+                    if not all([new_username, new_email, new_password, confirm_password]):
+                        st.error("⚠️ Tous les champs obligatoires doivent être remplis.")
+                    elif len(new_password) < 8:
+                        st.error("⚠️ Le mot de passe doit faire au moins 8 caractères.")
                     elif new_password != confirm_password:
                         st.error("⚠️ Les mots de passe ne correspondent pas.")
+                    elif not consent_gdpr:
+                        st.error("❌ Vous devez accepter la politique de gestion des données.")
                     else:
-                        success = register_user(new_username, new_password)
+                        # Utilisation du nouveau système d'authentification
+                        success, result = auth.register_user(
+                            new_username, new_email, new_password, 
+                            first_name, last_name, region
+                        )
                         if success:
-                            st.success("✅ Inscription réussie ! Vous pouvez maintenant vous connecter.")
+                            st.success(f"✅ {result}")
                             st.balloons()
+                            st.info("🔄 Vous pouvez maintenant vous connecter avec vos identifiants")
                         else:
-                            st.error("❌ Nom d'utilisateur déjà utilisé. Choisissez-en un autre.")
+                            st.error(f"❌ {result}")
             
             # Pied de page
             st.markdown("""
@@ -742,14 +786,19 @@ elif choice == "🔑 Connexion":
                     if not uname or not pwd:
                         st.error("⚠️ Veuillez remplir tous les champs.")
                     else:
-                        uid = login(uname, pwd)
-                        if uid:
-                            st.success(f"✅ Bienvenue, **{uname}** !")
+                        # Utilisation du nouveau système d'authentification
+                        success, result = auth.login_user(uname, pwd)
+                        if success:
+                            st.session_state.user_id = result["user_id"]
+                            st.session_state.username = result["username"]
+                            st.session_state.session_token = result["session_token"]
+                            st.session_state.logged_in = True
+                            st.success(f"✅ Bienvenue, **{result['username']}** !")
                             st.balloons()
                             time.sleep(1)
                             st.rerun()
                         else:
-                            st.error("❌ Nom d'utilisateur ou mot de passe incorrect.")
+                            st.error(f"❌ {result}")
             
             # Pied de page
             st.markdown("""
@@ -761,8 +810,18 @@ elif choice == "🔑 Connexion":
 
 # ─── PAGE DÉCONNEXION ──────────────────────────────────────────────────────────
 elif choice == "🚪 Déconnexion" and st.session_state.user_id is not None:
-    logout()
-    st.info("Vous avez été déconnecté.")
+    # Utilisation du nouveau système d'authentification
+    if "session_token" in st.session_state:
+        auth.logout_user(st.session_state.session_token)
+    
+    # Nettoyage de la session
+    for key in ["user_id", "username", "session_token", "logged_in"]:
+        if key in st.session_state:
+            del st.session_state[key]
+    
+    st.success("✅ Déconnexion réussie !")
+    st.info("Vous avez été déconnecté de votre compte.")
+    time.sleep(2)
     st.rerun()
 
 # ─── PAGE PRÉDICTION ──────────────────────────────────────────────────────────
