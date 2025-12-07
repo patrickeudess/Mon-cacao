@@ -4,16 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Estimation - Mon Cacao</title>
-    <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/modern-banner.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="js/modern-banner.js"></script>
+    <script src="js/auth.js"></script>
 
     <script>
-        >
+        // Vérifier l'authentification au chargement
+        document.addEventListener('DOMContentLoaded', function() {
+            if (checkAuthentication('producteur')) {
+                updateUserTypeDisplay();
+            }
+        });
 
-    <script>
         function lireTexte(texte) {
             if ('speechSynthesis' in window) {
                 const utterance = new SpeechSynthesisUtterance(texte);
@@ -40,21 +46,38 @@
     </script>
 </head>
 <body>
-    <!-- Header -->
+    <!-- Header harmonisé -->
     <header class="app-header">
         <div class="header-content">
+            <div class="header-left">
             <div class="header-logo">
-                <i class="fas fa-seedling"></i>
-                <span>Mon Cacao</span>
+                    <div class="logo-container">
+                        <i class="fas fa-seedling logo-plant"></i>
+                        <i class="fas fa-coins logo-coins"></i>
+                    </div>
+                    <div class="logo-text">
+                        <h1>Mon Cacao</h1>
+                    </div>
             </div>
-            <div class="header-actions">
-                <div class="status-indicator">
-                    <i class="fas fa-circle"></i>
+                <div class="user-status">
+                    <div class="status-line">
+                        <i class="fas fa-circle status-dot"></i>
                     <span>En ligne</span>
                 </div>
+                    <div class="user-info">
+                        <i class="fas fa-user user-icon"></i>
+                        <span id="userTypeLabel">Producteur</span>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="btn-change-profile" onclick="changeUserType()" title="Changer de profil">
+                    <i class="fas fa-exchange-alt"></i>
+                    <span>Changer de profil</span>
+                </button>
                 <a href="index.html" class="btn-back">
                     <i class="fas fa-arrow-left"></i>
-                    Retour
+                    <span>Retour</span>
                 </a>
             </div>
         </div>
@@ -63,15 +86,24 @@
     <!-- Section Estimation -->
     <main class="main-content">
         <div class="content-container">
-            <h1 class="section-title">🌱 Prédire ma Récolte</h1>
+            <div class="section-header">
+                <h1 class="section-title">
+                    <i class="fas fa-chart-line"></i>
+                    Prédire ma Récolte
+                </h1>
             <p class="section-subtitle">Remplissez les informations pour calculer votre production de cacao</p>
+            </div>
             
             <!-- Container de prédiction -->
             <div class="prediction-container">
                 <!-- Formulaire de prédiction -->
                 <div class="prediction-form-container">
                     <div class="prediction-form">
-                        <h3>🌱 Plantation</h3>
+                        <div class="form-section">
+                            <h3 class="form-section-title">
+                                <i class="fas fa-seedling"></i>
+                                Plantation
+                            </h3>
                         
                         <div class="form-group">
                             <label for="age_verger">Depuis combien d'années j'ai planté</label>
@@ -135,7 +167,13 @@
                             </select>
                         </div>
                         
-                        <h3>💰 Coûts & Prix</h3>
+                        </div>
+                        
+                        <div class="form-section">
+                            <h3 class="form-section-title">
+                                <i class="fas fa-coins"></i>
+                                Coûts & Prix
+                            </h3>
                         
                         <div class="form-group">
                             <label for="cout_prod">Coût par hectare (FCFA)</label>
@@ -147,7 +185,13 @@
                             <input type="number" id="prix_a" placeholder="1000" min="0" value="1000">
                         </div>
                         
-                        <h3>🌍 Région & Climat</h3>
+                        </div>
+                        
+                        <div class="form-section">
+                            <h3 class="form-section-title">
+                                <i class="fas fa-globe"></i>
+                                Région & Climat
+                            </h3>
                         
                         <div class="form-group">
                             <label for="region">Région</label>
@@ -169,12 +213,37 @@
                             </select>
                         </div>
                         
-
+                        </div>
                         
+                        <div class="form-section">
+                            <h3 class="form-section-title">
+                                <i class="fas fa-user"></i>
+                                Mes informations
+                            </h3>
+                        
+                        <div class="form-group">
+                            <label for="sexe">Je suis</label>
+                            <select id="sexe">
+                                <option value="Masculin" selected>Un homme</option>
+                                <option value="Feminin">Une femme</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="competences">Je sais lire et écrire</label>
+                            <select id="competences">
+                                <option value="oui, lire et écrire" selected>Oui, je sais</option>
+                                <option value="oui, lire seulement">Je sais seulement lire</option>
+                                <option value="non">Non, je ne sais pas</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-actions">
                         <button class="btn btn-primary btn-full" onclick="predictProductivity()">
                             <i class="fas fa-magic"></i>
                             Calculer ma récolte
                         </button>
+                        </div>
                     </div>
                 </div>
                 

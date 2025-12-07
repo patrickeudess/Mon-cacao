@@ -6,13 +6,19 @@
     <title>Mes enregistrements - Mon Cacao</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/modern-banner.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="js/modern-banner.js"></script>
+    <script src="js/auth.js"></script>
 
     <script>
-        >
+        // Vérifier l'authentification au chargement
+        document.addEventListener('DOMContentLoaded', function() {
+            if (checkAuthentication('producteur')) {
+                updateUserTypeDisplay();
+            }
+        });
 
-    <script>
         function lireTexte(texte) {
             if ('speechSynthesis' in window) {
                 const utterance = new SpeechSynthesisUtterance(texte);
@@ -23,7 +29,6 @@
         }
         
         document.addEventListener('DOMContentLoaded', function() {
-            // Boutons audio seulement sur les labels (questions)
             const labels = document.querySelectorAll('label');
             labels.forEach(label => {
                 if (!label.querySelector('.btn-audio')) {
@@ -39,21 +44,39 @@
     </script>
 </head>
 <body>
-    <!-- Header -->
+    <!-- Header harmonisé -->
     <header class="app-header">
         <div class="header-content">
+            <div class="header-left">
             <div class="header-logo">
-                <i class="fas fa-seedling"></i>
-                <span>Mon Cacao</span>
+                    <div class="logo-container">
+                        <i class="fas fa-seedling logo-plant"></i>
+                        <i class="fas fa-coins logo-coins"></i>
+                    </div>
+                    <div class="logo-text">
+                        <h1>Mon Cacao</h1>
+                    </div>
+                </div>
+                <div class="user-status">
+                    <div class="status-line">
+                        <i class="fas fa-circle status-dot"></i>
+                        <span>En ligne</span>
+                    </div>
+                    <div class="user-info">
+                        <i class="fas fa-user user-icon"></i>
+                        <span id="userTypeLabel">Producteur</span>
+                    </div>
+                </div>
             </div>
-            <div class="header-actions">
-                <button class="btn-deploy">
-                    <i class="fas fa-rocket"></i>
-                    Deploy
+            <div class="header-right">
+                <button class="btn-change-profile" onclick="changeUserType()" title="Changer de profil">
+                    <i class="fas fa-exchange-alt"></i>
+                    <span>Changer de profil</span>
                 </button>
-                <button class="btn-menu">
-                    <i class="fas fa-ellipsis-v"></i>
-                </button>
+                <a href="index.html" class="btn-back">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Retour</span>
+                </a>
             </div>
         </div>
     </header>
@@ -62,16 +85,15 @@
     <main class="main-content">
         <div class="content-container">
             <!-- Vue d'ensemble de vos données -->
-            <div class="overview-section">
-                <div class="overview-header">
-                    <div class="overview-title">
-                        <i class="fas fa-chart-bar"></i>
-                        <h1>Vue d'ensemble de vos données</h1>
-                    </div>
-                    <p class="overview-description">
-                        Consultez l'historique de vos soumissions et analysez l'évolution de vos performances.
-                    </p>
+            <div class="section-header">
+                <h1 class="section-title">
+                    <i class="fas fa-history"></i>
+                    Mes enregistrements
+                </h1>
+                <p class="section-subtitle">Consultez l'historique de vos soumissions et analysez l'évolution de vos performances</p>
                 </div>
+            
+            <div class="overview-section">
                 
                 <!-- Onglets -->
                 <div class="tabs-container">

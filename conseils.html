@@ -6,13 +6,19 @@
     <title>Aide Agroécologiques - Mon Cacao</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/modern-banner.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="js/modern-banner.js"></script>
+    <script src="js/auth.js"></script>
 
     <script>
-        >
+        // Vérifier l'authentification au chargement
+        document.addEventListener('DOMContentLoaded', function() {
+            if (checkAuthentication('producteur')) {
+                updateUserTypeDisplay();
+            }
+        });
 
-    <script>
         function lireTexte(texte) {
             if ('speechSynthesis' in window) {
                 const utterance = new SpeechSynthesisUtterance(texte);
@@ -23,7 +29,6 @@
         }
         
         document.addEventListener('DOMContentLoaded', function() {
-            // Boutons audio seulement sur les labels (questions)
             const labels = document.querySelectorAll('label');
             labels.forEach(label => {
                 if (!label.querySelector('.btn-audio')) {
@@ -35,25 +40,76 @@
                     label.appendChild(btnAudio);
                 }
             });
+            
+            // Enregistrer la consultation de la page conseils
+            trackConseilsPageView();
         });
+        
+        function trackConseilsPageView() {
+            const currentProducerId = localStorage.getItem('current_producer_id');
+            if (!currentProducerId) return;
+            
+            const adviceLog = JSON.parse(localStorage.getItem('advice_tracking') || '{}');
+            if (!adviceLog[currentProducerId]) {
+                adviceLog[currentProducerId] = [];
+            }
+            
+            // Enregistrer les catégories de conseils consultées
+            const conseilsCategories = [
+                { text: 'Recyclage des Nutriments - Utilisez les déchets organiques pour enrichir naturellement votre sol', category: 'Agroécologie', type: 'Recyclage nutriments', source: 'conseils' },
+                { text: 'Lutte Biologique - Favorisez les prédateurs naturels pour contrôler les ravageurs', category: 'Protection', type: 'Lutte biologique', source: 'conseils' },
+                { text: 'Diversité Biologique - Maintenez une variété d\'espèces pour un écosystème équilibré', category: 'Agroécologie', type: 'Diversité biologique', source: 'conseils' },
+                { text: 'Gestion de l\'Eau - Optimisez l\'utilisation de l\'eau et prévenez l\'érosion', category: 'Gestion eau', type: 'Optimisation eau', source: 'conseils' },
+                { text: 'Engrais Naturelle - Compost de feuilles de cacao : 5 kg par arbre tous les 6 mois', category: 'Fertilisation', type: 'Engrais organique', source: 'conseils' },
+                { text: 'Protection Biologique - Pièges à phéromones : Attirent et capturent les insectes nuisibles', category: 'Protection', type: 'Pièges phéromones', source: 'conseils' },
+                { text: 'Agroforesterie - Bananiers : Fournissent de l\'ombre et des nutriments', category: 'Agroforesterie', type: 'Arbres d\'ombrage', source: 'conseils' }
+            ];
+            
+            const timestamp = new Date().toISOString();
+            conseilsCategories.forEach(conseil => {
+                adviceLog[currentProducerId].push({
+                    ...conseil,
+                    timestamp: timestamp
+            });
+        });
+            
+            localStorage.setItem('advice_tracking', JSON.stringify(adviceLog));
+        }
     </script>
 </head>
 <body>
-    <!-- Header -->
+    <!-- Header harmonisé -->
     <header class="app-header">
         <div class="header-content">
+            <div class="header-left">
             <div class="header-logo">
-                <i class="fas fa-seedling"></i>
-                <span>Mon Cacao</span>
+                    <div class="logo-container">
+                        <i class="fas fa-seedling logo-plant"></i>
+                        <i class="fas fa-coins logo-coins"></i>
+                    </div>
+                    <div class="logo-text">
+                        <h1>Mon Cacao</h1>
+                    </div>
             </div>
-            <div class="header-actions">
-                <div class="status-indicator">
-                    <i class="fas fa-circle"></i>
+                <div class="user-status">
+                    <div class="status-line">
+                        <i class="fas fa-circle status-dot"></i>
                     <span>En ligne</span>
                 </div>
+                    <div class="user-info">
+                        <i class="fas fa-user user-icon"></i>
+                        <span id="userTypeLabel">Producteur</span>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="btn-change-profile" onclick="changeUserType()" title="Changer de profil">
+                    <i class="fas fa-exchange-alt"></i>
+                    <span>Changer de profil</span>
+                </button>
                 <a href="index.html" class="btn-back">
                     <i class="fas fa-arrow-left"></i>
-                    Retour
+                    <span>Retour</span>
                 </a>
             </div>
         </div>

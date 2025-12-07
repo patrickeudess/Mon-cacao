@@ -55,7 +55,9 @@ async function predictProductivity() {
     const insecticide = document.getElementById('insecticide').value;
     const fongicide = document.getElementById('fongicide').value;
     const cout_prod = parseFloat(document.getElementById('cout_prod').value) || 0;
-    const prix_a = parseFloat(document.getElementById('prix_a').value) || 750000;
+    // Le prix est saisi en FCFA/kg, mais l'API attend FCFA/tonne, donc on multiplie par 1000
+    const prix_a_kg = parseFloat(document.getElementById('prix_a').value) || 1000; // FCFA/kg
+    const prix_a = prix_a_kg * 1000; // Conversion en FCFA/tonne pour l'API
     const region = document.getElementById('region').value;
     const pluviometrie = document.getElementById('pluviometrie').value;
     const sexe = document.getElementById('sexe').value;
@@ -164,7 +166,7 @@ function simulatePrediction(age_verger, cout_prod, region) {
     const confidence = Math.round(85 + Math.random() * 10);
     
     // Calculs financiers
-    const prix_kg = 750; // FCFA/kg
+    const prix_kg = parseFloat(document.getElementById('prix_a').value) || 1000; // FCFA/kg
     const revenue = productivity * prix_kg;
     const benefit = revenue - cout_prod;
     
@@ -775,9 +777,12 @@ function updateEstimationCards(prediction) {
 function updateCalculationDetails(prediction) {
     const production = prediction.productivity_t_ha;
     const productionKg = production * 1000;
-    const price = 1000; // FCFA/kg
+    
+    // Récupérer les vraies valeurs saisies par l'utilisateur
+    const price = parseFloat(document.getElementById('prix_a').value) || 1000; // FCFA/kg
+    const cost = parseFloat(document.getElementById('cout_prod').value) || 450000; // FCFA/ha
+    
     const revenue = productionKg * price;
-    const cost = 55000; // FCFA/ha
     const benefit = revenue - cost;
     
     const detailsHtml = `
@@ -804,7 +809,7 @@ function updateCalculationDetails(prediction) {
 function updateAnalysisAndRecommendations(prediction) {
     const production = prediction.productivity_t_ha;
     const regionalAverage = 0.850;
-    const cost = 55000;
+    const cost = parseFloat(document.getElementById('cout_prod').value) || 450000;
     const regionalCost = 450000;
     
     // Mettre à jour l'analyse de productivité
@@ -814,18 +819,33 @@ function updateAnalysisAndRecommendations(prediction) {
     const recommendations = [];
     
     if (production < regionalAverage) {
-        recommendations.push("Si la production est inférieure à la moyenne, envisagez d'optimiser l'utilisation des engrais et de vérifier l'état sanitaire des plants.");
+        recommendations.push({
+            text: "Si la production est inférieure à la moyenne, envisagez d'optimiser l'utilisation des engrais et de vérifier l'état sanitaire des plants.",
+            category: 'Productivité',
+            type: 'Optimisation engrais'
+        });
     }
     
     if (cost > regionalCost) {
-        recommendations.push("Si le coût de production est élevé, analysez la répartition des coûts et optimisez l'utilisation des intrants.");
+        recommendations.push({
+            text: "Si le coût de production est élevé, analysez la répartition des coûts et optimisez l'utilisation des intrants.",
+            category: 'Coûts',
+            type: 'Optimisation coûts'
+        });
     }
     
-    recommendations.push("Pour améliorer le bénéfice, cherchez des circuits de vente plus avantageux et réduisez les coûts non essentiels.");
+    recommendations.push({
+        text: "Pour améliorer le bénéfice, cherchez des circuits de vente plus avantageux et réduisez les coûts non essentiels.",
+        category: 'Revenus',
+        type: 'Optimisation bénéfices'
+    });
     
     // Afficher les recommandations
     const recommendationsList = document.getElementById('recommendations-list');
-    recommendationsList.innerHTML = recommendations.map(rec => `<li>${rec}</li>`).join('');
+    recommendationsList.innerHTML = recommendations.map(rec => `<li>${rec.text}</li>`).join('');
+    
+    // Enregistrer les conseils consultés
+    trackAdviceGiven(recommendations, 'prediction');
 }
 
 // Créer le graphique comparatif
@@ -837,7 +857,7 @@ function createComparisonChart(prediction) {
     }
     
     const production = prediction.productivity_t_ha;
-    const cost = 55000 / 10000; // Divisé par 10000 pour l'affichage
+    const cost = (parseFloat(document.getElementById('cout_prod').value) || 450000) / 10000; // Divisé par 10000 pour l'affichage
     const regionalProduction = 0.850;
     const regionalCost = 450000 / 10000;
     
@@ -924,7 +944,7 @@ function createFinancialChart(prediction) {
     }
     
     const revenue = prediction.revenue_fcfa;
-    const cost = 55000;
+    const cost = parseFloat(document.getElementById('cout_prod').value) || 450000;
     const benefit = revenue - cost;
     
     const benefitPercentage = ((benefit / revenue) * 100).toFixed(1);
@@ -970,6 +990,30 @@ function createFinancialChart(prediction) {
 }
 
 // Mettre à jour les suggestions d'optimisation
+// Fonction pour enregistrer les conseils donnés
+function trackAdviceGiven(advices, source) {
+    const currentProducerId = localStorage.getItem('current_producer_id');
+    if (!currentProducerId) return; // Pas de producteur associé
+    
+    const adviceLog = JSON.parse(localStorage.getItem('advice_tracking') || '{}');
+    if (!adviceLog[currentProducerId]) {
+        adviceLog[currentProducerId] = [];
+    }
+    
+    const timestamp = new Date().toISOString();
+    advices.forEach(advice => {
+        adviceLog[currentProducerId].push({
+            text: advice.text || advice,
+            category: advice.category || 'Général',
+            type: advice.type || 'Autre',
+            source: source, // 'prediction', 'conseils', 'assistant', 'score-ecologique'
+            timestamp: timestamp
+        });
+    });
+    
+    localStorage.setItem('advice_tracking', JSON.stringify(adviceLog));
+}
+
 function updateOptimizationSuggestions(prediction) {
     const production = prediction.productivity_t_ha;
     const regionalAverage = 0.850;
@@ -1228,11 +1272,27 @@ function submitAnnualDataMain() {
         humidite: parseFloat(document.getElementById('humidite_main').value) || 0,
         
         // Date de soumission
-        date_soumission: document.getElementById('submission-date-main').textContent
+        date_soumission: document.getElementById('submission-date-main').textContent || new Date().toISOString()
     };
     
-    // Sauvegarder dans localStorage
+    // Sauvegarder dans localStorage (ancien format pour compatibilité)
     localStorage.setItem('annualData', JSON.stringify(formData));
+    
+    // Récupérer l'ID du producteur actuel (si défini par un professionnel)
+    const currentProducerId = localStorage.getItem('current_producer_id');
+    
+    // Si un producteur est associé, sauvegarder ses données pour le professionnel
+    if (currentProducerId) {
+        const allProducerData = JSON.parse(localStorage.getItem('all_producer_submissions')) || {};
+        if (!allProducerData[currentProducerId]) {
+            allProducerData[currentProducerId] = [];
+        }
+        allProducerData[currentProducerId].push(formData);
+        localStorage.setItem('all_producer_submissions', JSON.stringify(allProducerData));
+        console.log('✅ Données associées au producteur ID:', currentProducerId);
+    } else {
+        console.log('ℹ️ Aucun code producteur associé. Les données seront sauvegardées localement uniquement.');
+    }
     
     // Afficher une notification de succès
     showNotification('✅ Vos données ont été enregistrées avec succès !', 'success');
@@ -1241,6 +1301,9 @@ function submitAnnualDataMain() {
     updateSubmissionDateMain();
     
     console.log('Données soumises:', formData);
+    if (currentProducerId) {
+        console.log('Données associées au producteur:', currentProducerId);
+    }
 }
 
 function updateSubmissionDateMain() {
@@ -1356,13 +1419,79 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Fonctions pour gérer l'affichage des sections
 function showPredictionSection() {
-    document.querySelector('.features-section').style.display = 'none';
-    document.querySelector('.current-status-section').style.display = 'none';
-    document.getElementById('prediction-section').style.display = 'block';
+    const featuresSection = document.querySelector('.features-section');
+    const currentStatusSection = document.querySelector('.current-status-section');
+    const predictionSection = document.getElementById('prediction-section');
+    
+    if (featuresSection) featuresSection.style.display = 'none';
+    if (currentStatusSection) currentStatusSection.style.display = 'none';
+    if (predictionSection) {
+        predictionSection.style.display = 'block';
+        // Faire défiler vers le haut de la section prédiction
+        predictionSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
 }
 
 function showHomeSection() {
-    document.querySelector('.features-section').style.display = 'block';
-    document.querySelector('.current-status-section').style.display = 'block';
-    document.getElementById('prediction-section').style.display = 'none';
+    const featuresSection = document.querySelector('.features-section');
+    const currentStatusSection = document.querySelector('.current-status-section');
+    const predictionSection = document.getElementById('prediction-section');
+    
+    if (featuresSection) featuresSection.style.display = 'block';
+    if (currentStatusSection) currentStatusSection.style.display = 'block';
+    if (predictionSection) {
+        predictionSection.style.display = 'none';
+        // Faire défiler vers le haut de la page
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
 }
+
+// Fonction améliorée pour le bouton de retour
+function handleBackButton() {
+    // Si on est sur index.html, ne rien faire ou fermer l'application
+    if (window.location.pathname.includes('index.html') || window.location.pathname.endsWith('/')) {
+        // Optionnel : demander confirmation pour quitter
+        if (confirm('Voulez-vous vraiment quitter l\'application ?')) {
+            window.close();
+        }
+        return;
+    }
+    
+    // Sinon, retourner à la page d'accueil
+    window.location.href = 'index.html';
+}
+
+// Améliorer les boutons de retour avec fonctionnalité intelligente
+document.addEventListener('DOMContentLoaded', function() {
+    const backButtons = document.querySelectorAll('.btn-back');
+    backButtons.forEach(btn => {
+        // Si le bouton n'a pas déjà un href, ajouter la fonctionnalité
+        if (!btn.getAttribute('href')) {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                handleBackButton();
+            });
+        } else {
+            // Améliorer l'animation au clic
+            btn.addEventListener('click', function() {
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 150);
+            });
+        }
+    });
+    
+    // Améliorer le bouton Quitter sur index.html
+    const disconnectBtn = document.querySelector('.btn-disconnect');
+    if (disconnectBtn) {
+        disconnectBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (confirm('Voulez-vous vraiment quitter l\'application ?')) {
+                // Optionnel : effacer les données de session
+                localStorage.clear();
+                window.close();
+            }
+        });
+    }
+});

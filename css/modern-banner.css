@@ -53,15 +53,9 @@
     z-index: 2;
 }
 
+/* Styles logo-container remplacés par style.css pour uniformisation */
 .logo-container {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 26px;
-    background: rgba(255,255,255,0.1);
-    padding: 8px 12px;
-    border-radius: 12px;
-    backdrop-filter: blur(10px);
+    /* Styles déplacés dans style.css pour uniformisation */
 }
 
 .logo-icon {

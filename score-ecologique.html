@@ -5,8 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🌍 Note environnement - Mon Cacao</title>
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="css/modern-banner.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         .eco-container {
             max-width: 1200px;
@@ -632,11 +633,16 @@
         }
     </style>
     <script src="js/modern-banner.js"></script>
+    <script src="js/auth.js"></script>
 
     <script>
-        >
+        // Vérifier l'authentification au chargement
+        document.addEventListener('DOMContentLoaded', function() {
+            if (checkAuthentication('producteur')) {
+                updateUserTypeDisplay();
+            }
+        });
 
-    <script>
         function lireTexte(texte) {
             if ('speechSynthesis' in window) {
                 const utterance = new SpeechSynthesisUtterance(texte);
@@ -647,7 +653,6 @@
         }
         
         document.addEventListener('DOMContentLoaded', function() {
-            // Boutons audio seulement sur les labels (questions)
             const labels = document.querySelectorAll('label');
             labels.forEach(label => {
                 if (!label.querySelector('.btn-audio')) {
@@ -663,21 +668,53 @@
     </script>
 </head>
 <body>
-    <!-- Header -->
+    <!-- Header harmonisé -->
     <header class="app-header">
-        <!-- La bannière moderne sera générée par JavaScript -->
+        <div class="header-content">
+            <div class="header-left">
+                <div class="header-logo">
+                    <div class="logo-container">
+                        <i class="fas fa-seedling logo-plant"></i>
+                        <i class="fas fa-coins logo-coins"></i>
+                    </div>
+                    <div class="logo-text">
+                        <h1>Mon Cacao</h1>
+                    </div>
+                </div>
+                <div class="user-status">
+                    <div class="status-line">
+                        <i class="fas fa-circle status-dot"></i>
+                        <span>En ligne</span>
+                    </div>
+                    <div class="user-info">
+                        <i class="fas fa-user user-icon"></i>
+                        <span id="userTypeLabel">Producteur</span>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="btn-change-profile" onclick="changeUserType()" title="Changer de profil">
+                    <i class="fas fa-exchange-alt"></i>
+                    <span>Changer de profil</span>
+                </button>
+                <a href="index.html" class="btn-back">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Retour</span>
+                </a>
+            </div>
+        </div>
     </header>
 
     <!-- Section Note environnement -->
     <main class="main-content">
         <div class="content-container">
             <div class="eco-container">
-                <div class="eco-header">
-                    <h1 class="eco-title">
+                <div class="section-header">
+                    <h1 class="section-title">
                         <i class="fas fa-leaf"></i>
                         Note environnement
                     </h1>
-                    <p class="eco-subtitle">
+                    <p class="section-subtitle">
                         Évaluez l'impact environnemental de votre plantation de cacao
                     </p>
                 </div>
@@ -1209,10 +1246,35 @@
                     <div class="recommendation-icon">
                         <i class="fas fa-lightbulb"></i>
                     </div>
-                    <span>${rec}</span>
+                    <span>${rec.text || rec}</span>
                 `;
                 recList.appendChild(li);
             });
+            
+            // Enregistrer les conseils donnés
+            if (typeof trackAdviceGiven === 'function') {
+                trackAdviceGiven(recommendations, 'score-ecologique');
+            } else {
+                // Fallback si la fonction n'est pas encore chargée
+                const currentProducerId = localStorage.getItem('current_producer_id');
+                if (currentProducerId) {
+                    const adviceLog = JSON.parse(localStorage.getItem('advice_tracking') || '{}');
+                    if (!adviceLog[currentProducerId]) {
+                        adviceLog[currentProducerId] = [];
+                    }
+                    const timestamp = new Date().toISOString();
+                    recommendations.forEach(rec => {
+                        adviceLog[currentProducerId].push({
+                            text: rec.text || rec,
+                            category: rec.category || 'Général',
+                            type: rec.type || 'Autre',
+                            source: 'score-ecologique',
+                            timestamp: timestamp
+                        });
+                    });
+                    localStorage.setItem('advice_tracking', JSON.stringify(adviceLog));
+                }
+            }
 
             resultDiv.style.display = 'block';
             resultDiv.scrollIntoView({ behavior: 'smooth' });
@@ -1222,27 +1284,51 @@
             const recommendations = [];
 
             if (values.ombrage < 2) {
-                recommendations.push("Augmentez la densité des arbres d'ombrage pour améliorer la biodiversité et réduire l'érosion.");
+                recommendations.push({
+                    text: "Augmentez la densité des arbres d'ombrage pour améliorer la biodiversité et réduire l'érosion.",
+                    category: 'Agroforesterie',
+                    type: 'Arbres d\'ombrage'
+                });
             }
 
             if (values.couverture < 1) {
-                recommendations.push("Implémentez une couverture végétale du sol pour réduire l'érosion et améliorer la fertilité.");
+                recommendations.push({
+                    text: "Implémentez une couverture végétale du sol pour réduire l'érosion et améliorer la fertilité.",
+                    category: 'Agroécologie',
+                    type: 'Couverture végétale'
+                });
             }
 
             if (values.fertilisation < 2) {
-                recommendations.push("Privilégiez les engrais organiques et le compost pour réduire l'impact environnemental.");
+                recommendations.push({
+                    text: "Privilégiez les engrais organiques et le compost pour réduire l'impact environnemental.",
+                    category: 'Fertilisation',
+                    type: 'Engrais organique'
+                });
             }
 
             if (values.pesticides > 1) {
-                recommendations.push("Réduisez l'utilisation de pesticides en favorisant les méthodes de lutte biologique.");
+                recommendations.push({
+                    text: "Réduisez l'utilisation de pesticides en favorisant les méthodes de lutte biologique.",
+                    category: 'Protection',
+                    type: 'Réduction pesticides'
+                });
             }
 
             if (values.biodiversite < 1) {
-                recommendations.push("Créez des zones de refuge pour la biodiversité (haies, bosquets, mares).");
+                recommendations.push({
+                    text: "Créez des zones de refuge pour la biodiversité (haies, bosquets, mares).",
+                    category: 'Biodiversité',
+                    type: 'Zones refuge'
+                });
             }
 
             if (score < 70) {
-                recommendations.push("Considérez l'obtention d'une certification environnementale pour valoriser vos pratiques.");
+                recommendations.push({
+                    text: "Considérez l'obtention d'une certification environnementale pour valoriser vos pratiques.",
+                    category: 'Certification',
+                    type: 'Certification environnementale'
+                });
             }
 
             return recommendations.slice(0, 3);

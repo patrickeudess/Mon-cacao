@@ -6,14 +6,20 @@
     <title>Enregistrer - Mon Cacao</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/modern-banner.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="js/modern-banner.js"></script>
+    <script src="js/auth.js"></script>
 
     <script>
-        >
+        // Vérifier l'authentification au chargement
+        document.addEventListener('DOMContentLoaded', function() {
+            if (checkAuthentication('producteur')) {
+                updateUserTypeDisplay();
+            }
+        });
 
-    <script>
         function lireTexte(texte) {
             if ('speechSynthesis' in window) {
                 const utterance = new SpeechSynthesisUtterance(texte);
@@ -24,7 +30,22 @@
         }
         
         document.addEventListener('DOMContentLoaded', function() {
-            // Boutons audio seulement sur les labels (questions)
+            // Initialiser la date de soumission
+            if (typeof updateSubmissionDateMain === 'function') {
+                updateSubmissionDateMain();
+            } else {
+                // Fallback si la fonction n'est pas encore chargée
+                const today = new Date();
+                const dateString = today.getFullYear() + '/' + 
+                                  String(today.getMonth() + 1).padStart(2, '0') + '/' + 
+                                  String(today.getDate()).padStart(2, '0');
+                const dateElement = document.getElementById('submission-date-main');
+                if (dateElement) {
+                    dateElement.textContent = dateString;
+                }
+            }
+            
+            // Ajouter les boutons audio aux labels
             const labels = document.querySelectorAll('label');
             labels.forEach(label => {
                 if (!label.querySelector('.btn-audio')) {
@@ -40,32 +61,52 @@
     </script>
 </head>
 <body>
-    <!-- Header -->
+    <!-- Header harmonisé -->
     <header class="app-header">
         <div class="header-content">
+            <div class="header-left">
             <div class="header-logo">
-                <i class="fas fa-seedling"></i>
-                <span>Mon Cacao</span>
+                    <div class="logo-container">
+                        <i class="fas fa-seedling logo-plant"></i>
+                        <i class="fas fa-coins logo-coins"></i>
+                    </div>
+                    <div class="logo-text">
+                        <h1>Mon Cacao</h1>
+                    </div>
             </div>
-            <div class="header-actions">
-                <div class="status-indicator">
-                    <i class="fas fa-circle"></i>
+                <div class="user-status">
+                    <div class="status-line">
+                        <i class="fas fa-circle status-dot"></i>
                     <span>En ligne</span>
                 </div>
+                    <div class="user-info">
+                        <i class="fas fa-user user-icon"></i>
+                        <span id="userTypeLabel">Producteur</span>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="btn-change-profile" onclick="changeUserType()" title="Changer de profil">
+                    <i class="fas fa-exchange-alt"></i>
+                    <span>Changer de profil</span>
+                </button>
                 <a href="index.html" class="btn-back">
                     <i class="fas fa-arrow-left"></i>
-                    Retour
+                    <span>Retour</span>
                 </a>
             </div>
         </div>
     </header>
 
     <!-- Section Enregistrer des Données -->
-    <section class="data-submission-section">
+    <main class="main-content">
         <div class="content-container">
             <div class="section-header">
-                <h2>📊 Enregistrer vos données annuelles réelles</h2>
-                <p>Partagez vos données pour améliorer la précision de nos prédictions</p>
+                <h1 class="section-title">
+                    <i class="fas fa-upload"></i>
+                    Enregistrer vos données
+                </h1>
+                <p class="section-subtitle">Partagez vos données pour améliorer la précision de nos prédictions</p>
             </div>
             
             <!-- Instructions -->
@@ -287,7 +328,7 @@
                 ENREGISTRER MES DONNÉES
             </button>
         </div>
-    </section>
+    </main>
 
     <script src="js/script.js"></script>
 </body>

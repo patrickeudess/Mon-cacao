@@ -4,39 +4,43 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🌱 Mon Cacao - Accueil</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/modern-banner.css">
     <link rel="stylesheet" href="css/dashboard.css">
     <link rel="stylesheet" href="css/home.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="header-container">
+    <!-- Header harmonisé -->
+    <header class="app-header">
+        <div class="header-content">
             <div class="header-left">
-                <div class="logo">
-                    <div class="logo-icon">
-                        <i class="fas fa-seedling"></i>
+                <div class="header-logo">
+                    <div class="logo-container">
+                        <i class="fas fa-seedling logo-plant"></i>
+                        <i class="fas fa-coins logo-coins"></i>
                     </div>
                     <div class="logo-text">
-                        <i class="fas fa-coins"></i>
-                        <span>Mon Cacao</span>
+                        <h1>Mon Cacao</h1>
                     </div>
                 </div>
-            </div>
-            <div class="header-right">
-                <div class="status-indicator">
-                    <div class="status-dot online"></div>
+                <div class="user-status">
+                    <div class="status-line">
+                        <i class="fas fa-circle status-dot"></i>
                     <span>En ligne</span>
                 </div>
                 <div class="user-info">
-                    <i class="fas fa-user"></i>
+                        <i class="fas fa-user user-icon"></i>
                     <span>Agriculteur</span>
                 </div>
-                <button class="logout-btn" onclick="logout()">
-                    <i class="fas fa-sign-out-alt"></i>
-                    Déconnexion
-                </button>
+                </div>
+            </div>
+            <div class="header-right">
+                <a href="index.html" class="btn-back">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Retour</span>
+                </a>
             </div>
         </div>
     </header>

@@ -6,13 +6,19 @@
     <title>Aide intelligent - Mon Cacao</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/modern-banner.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="js/modern-banner.js"></script>
+    <script src="js/auth.js"></script>
 
     <script>
-        >
+        // Vérifier l'authentification au chargement
+        document.addEventListener('DOMContentLoaded', function() {
+            if (checkAuthentication('producteur')) {
+                updateUserTypeDisplay();
+            }
+        });
 
-    <script>
         function lireTexte(texte) {
             if ('speechSynthesis' in window) {
                 const utterance = new SpeechSynthesisUtterance(texte);
@@ -23,7 +29,6 @@
         }
         
         document.addEventListener('DOMContentLoaded', function() {
-            // Boutons audio seulement sur les labels (questions)
             const labels = document.querySelectorAll('label');
             labels.forEach(label => {
                 if (!label.querySelector('.btn-audio')) {
@@ -39,21 +44,38 @@
     </script>
 </head>
 <body>
-    <!-- Header -->
+    <!-- Header harmonisé -->
     <header class="app-header">
         <div class="header-content">
+            <div class="header-left">
             <div class="header-logo">
-                <i class="fas fa-seedling"></i>
-                <span>Mon Cacao</span>
+                    <div class="logo-container">
+                        <i class="fas fa-seedling logo-plant"></i>
+                        <i class="fas fa-coins logo-coins"></i>
+                    </div>
+                    <div class="logo-text">
+                        <h1>Mon Cacao</h1>
+                    </div>
             </div>
-            <div class="header-actions">
-                <div class="status-indicator">
-                    <i class="fas fa-circle"></i>
+                <div class="user-status">
+                    <div class="status-line">
+                        <i class="fas fa-circle status-dot"></i>
                     <span>En ligne</span>
                 </div>
+                    <div class="user-info">
+                        <i class="fas fa-user user-icon"></i>
+                        <span id="userTypeLabel">Producteur</span>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="btn-change-profile" onclick="changeUserType()" title="Changer de profil">
+                    <i class="fas fa-exchange-alt"></i>
+                    <span>Changer de profil</span>
+                </button>
                 <a href="index.html" class="btn-back">
                     <i class="fas fa-arrow-left"></i>
-                    Retour
+                    <span>Retour</span>
                 </a>
             </div>
         </div>
@@ -278,16 +300,60 @@
         
         function generateAIResponse(question) {
             const responses = {
-                'Comment améliorer ma productivité ?': 'Basé sur vos données, voici mes conseils pour améliorer votre productivité :\n\n1. **J'ai des arbres avec le cacao** : Vos données montrent +20% de productivité avec cette pratique\n2. **Engrais** : Utilisez du compost naturel (3 kg par arbre)\n3. **Irrigation** : Arrosez régulièrement en saison sèche\n4. **Surveillance** : Inspectez vos arbres chaque semaine\n\nVotre productivité actuelle de 0.7 t/ha peut atteindre 1.2 t/ha avec ces pratiques.',
+                'Comment améliorer ma productivité ?': {
+                    text: 'Basé sur vos données, voici mes conseils pour améliorer votre productivité :\n\n1. **J\'ai des arbres avec le cacao** : Vos données montrent +20% de productivité avec cette pratique\n2. **Engrais** : Utilisez du compost naturel (3 kg par arbre)\n3. **Irrigation** : Arrosez régulièrement en saison sèche\n4. **Surveillance** : Inspectez vos arbres chaque semaine\n\nVotre productivité actuelle de 0.7 t/ha peut atteindre 1.2 t/ha avec ces pratiques.',
+                    category: 'Productivité',
+                    type: 'Amélioration productivité'
+                },
                 
-                'Quels engrais utiliser ?': 'Voici mes recommandations d\'engrais basées sur vos données :\n\n**Recommandé :**\n• Compost naturel (3 kg par arbre, tous les 3 mois)\n• Fumier de volaille\n• Engrais organiques\n\n**À éviter :**\n• Excès d\'engrais chimiques\n• Application en période de pluie\n\nVos données montrent que l\'utilisation d\'engrais augmente la productivité de 15%.',
+                'Quels engrais utiliser ?': {
+                    text: 'Voici mes recommandations d\'engrais basées sur vos données :\n\n**Recommandé :**\n• Compost naturel (3 kg par arbre, tous les 3 mois)\n• Fumier de volaille\n• Engrais organiques\n\n**À éviter :**\n• Excès d\'engrais chimiques\n• Application en période de pluie\n\nVos données montrent que l\'utilisation d\'engrais augmente la productivité de 15%.',
+                    category: 'Fertilisation',
+                    type: 'Choix engrais'
+                },
                 
-                'Lutter contre les maladies': 'Voici comment lutter contre les maladies du cacao :\n\n**Prévention :**\n• Inspection hebdomadaire des arbres\n• Bonne aération entre les arbres\n• Éviter l\'excès d\'humidité\n\n**Traitement :**\n• Éliminer les parties malades\n• Utiliser des fongicides préventifs\n• Maintenir une bonne hygiène\n\nVos données montrent que les maladies réduisent la productivité de 10%.',
+                'Lutter contre les maladies': {
+                    text: 'Voici comment lutter contre les maladies du cacao :\n\n**Prévention :**\n• Inspection hebdomadaire des arbres\n• Bonne aération entre les arbres\n• Éviter l\'excès d\'humidité\n\n**Traitement :**\n• Éliminer les parties malades\n• Utiliser des fongicides préventifs\n• Maintenir une bonne hygiène\n\nVos données montrent que les maladies réduisent la productivité de 10%.',
+                    category: 'Protection',
+                    type: 'Lutte maladies'
+                },
                 
-                'Optimiser les coûts': 'Basé sur vos données de coûts (0 à 450,000 FCFA), voici mes conseils :\n\n**Réductions possibles :**\n• Utiliser du compost naturel (moins cher que les engrais chimiques)\n• Pratiquer l\'agroforesterie (réduit les coûts d\'intrants)\n• Optimiser l\'irrigation\n• Traitements préventifs (moins coûteux que curatifs)\n\n**Investissements rentables :**\n• Formation sur les bonnes pratiques\n• Outils de surveillance\n• Système d\'irrigation goutte-à-goutte'
+                'Optimiser les coûts': {
+                    text: 'Basé sur vos données de coûts (0 à 450,000 FCFA), voici mes conseils :\n\n**Réductions possibles :**\n• Utiliser du compost naturel (moins cher que les engrais chimiques)\n• Pratiquer l\'agroforesterie (réduit les coûts d\'intrants)\n• Optimiser l\'irrigation\n• Traitements préventifs (moins coûteux que curatifs)\n\n**Investissements rentables :**\n• Formation sur les bonnes pratiques\n• Outils de surveillance\n• Système d\'irrigation goutte-à-goutte',
+                    category: 'Coûts',
+                    type: 'Optimisation coûts'
+                }
             };
             
-            return responses[question] || 'Merci pour votre question ! Basé sur vos données de production, je peux vous donner des conseils personnalisés. Pouvez-vous préciser votre question sur la culture du cacao ?';
+            const response = responses[question] || {
+                text: 'Merci pour votre question ! Basé sur vos données de production, je peux vous donner des conseils personnalisés. Pouvez-vous préciser votre question sur la culture du cacao ?',
+                category: 'Général',
+                type: 'Question générale'
+            };
+            
+            // Enregistrer le conseil donné
+            if (typeof trackAdviceGiven === 'function') {
+                trackAdviceGiven([response], 'assistant');
+            } else {
+                // Fallback si la fonction n'est pas encore chargée
+                const currentProducerId = localStorage.getItem('current_producer_id');
+                if (currentProducerId) {
+                    const adviceLog = JSON.parse(localStorage.getItem('advice_tracking') || '{}');
+                    if (!adviceLog[currentProducerId]) {
+                        adviceLog[currentProducerId] = [];
+                    }
+                    adviceLog[currentProducerId].push({
+                        text: response.text,
+                        category: response.category || 'Général',
+                        type: response.type || 'Autre',
+                        source: 'assistant',
+                        timestamp: new Date().toISOString()
+                    });
+                    localStorage.setItem('advice_tracking', JSON.stringify(adviceLog));
+                }
+            }
+            
+            return response.text;
         }
         
         function handleKeyPress(event) {
